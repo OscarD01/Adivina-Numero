@@ -62,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
-    //Prepare Dialog
     public void prepareAlertDialog(){
         AlertDialog.Builder adb = new AlertDialog.Builder(this);
         adb.setTitle("¿Quieres guardar tu puntuación en el Ranking?");
