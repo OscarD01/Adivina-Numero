@@ -6,11 +6,13 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
+import android.widget.Chronometer;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,6 +28,12 @@ public class MainActivity extends AppCompatActivity {
     private  String name = "vacio";
     public int tries = 0;
     private AlertDialog adRanking;
+    private String value;
+    private int numGuess = 0;
+    private TextView txtTimer;
+    private Chronometer chronometer;
+    private long pauseOffset;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,8 +42,11 @@ public class MainActivity extends AppCompatActivity {
         prepareAlertDialog();
         final Button btn = findViewById(R.id.btnEnviar);
         final TextView etTexto = findViewById(R.id.etTexto);
+        txtTimer = findViewById(R.id.txtTimer);
+        txtTimer.setText("");
         etTexto.setInputType(InputType.TYPE_CLASS_NUMBER);
-        final int numGuess = numRandom();
+        chronometer = findViewById(R.id.chrono);
+        numRandom();
         btn.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View v) {
@@ -44,15 +55,20 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "El numero que has introducido es mas grande", Toast.LENGTH_SHORT).show();
                     etTexto.setText("");
                     tries++;
+                    System.out.println(tries);
                 } else if (numUser < numGuess) {
                     Toast.makeText(MainActivity.this, "El numero que has introducido es mas pequeño", Toast.LENGTH_SHORT).show();
                     etTexto.setText("");
                     tries++;
+                    System.out.println(tries);
+
                 } else if (numUser == numGuess) {
+                    pauseOffset = SystemClock.elapsedRealtime() - chronometer.getBase();
+                    chronometer.stop();
                     tries++;
                     Toast.makeText(MainActivity.this, "Correcto. Has acertado en " + tries + " intentos", Toast.LENGTH_SHORT).show();
                     etTexto.setText("");
-                    tries = 0;
+                    System.out.println(pauseOffset);
                     showRankingDialog();
                 } else if(numUser > 100 || numUser < 0){
                     Toast.makeText(MainActivity.this, "El numero no se encuentra entre 0 y 100", Toast.LENGTH_SHORT).show();
@@ -91,17 +107,28 @@ public class MainActivity extends AppCompatActivity {
         adRanking.show();
         adRanking.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-                String value = nameRanking.getText().toString();
-                Intent intent = new Intent(getApplicationContext(), HallOfFame.class);
-                intent.putExtra(EXTRA_MESSAGE, value);
-                startActivity(intent);
+                value = nameRanking.getText().toString();
+                System.out.println(tries);
+                openRanking();
             }
         });
     }
 
+    public void openRanking(){
+        String message = value + "," + tries;
+        //Reset
+        numRandom();
+        Intent intent = new Intent(getApplicationContext(), HallOfFame.class);
+        intent.putExtra(EXTRA_MESSAGE, message);
+        startActivity(intent);
+    }
 
-    public static int numRandom(){
-        int numGuess = (int) (Math.random() * 100 + 1);
-        return numGuess;
+
+    public void  numRandom(){
+        numGuess = (int) (Math.random() * 100 + 1);
+        chronometer.setBase(SystemClock.elapsedRealtime());
+        chronometer.start();
+        numGuess = 20;
+        tries = 0;
     }
 }
