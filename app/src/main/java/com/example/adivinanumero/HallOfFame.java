@@ -18,6 +18,6 @@ public class HallOfFame extends AppCompatActivity {
         Intent intent = getIntent();
         String intentMessage = intent.getStringExtra(MainActivity.EXTRA_MESSAGE);
         String[] intentMessageSplit = intentMessage.split(",");
-        fame.append("\n" + intentMessageSplit[0] + "    " + intentMessageSplit[1]);
+        fame.append("\n" + intentMessageSplit[0] + "    " + intentMessageSplit[1] + "   " + intentMessageSplit[2]);
     }
 }

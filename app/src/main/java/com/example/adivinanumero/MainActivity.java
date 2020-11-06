@@ -25,7 +25,6 @@ import static android.provider.AlarmClock.EXTRA_MESSAGE;
 public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_MESSAGE = "com.example.adivinanumero.MESSAGE";
     private static EditText nameRanking;
-    private  String name = "vacio";
     public int tries = 0;
     private AlertDialog adRanking;
     private String value;
@@ -68,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
                     tries++;
                     Toast.makeText(MainActivity.this, "Correcto. Has acertado en " + tries + " intentos", Toast.LENGTH_SHORT).show();
                     etTexto.setText("");
-                    System.out.println(pauseOffset);
+                    System.out.println(pauseOffset/1000);
                     showRankingDialog();
                 } else if(numUser > 100 || numUser < 0){
                     Toast.makeText(MainActivity.this, "El numero no se encuentra entre 0 y 100", Toast.LENGTH_SHORT).show();
@@ -115,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void openRanking(){
-        String message = value + "," + tries;
+        String message = value + "," + tries + "," + pauseOffset/1000;
         //Reset
         numRandom();
         Intent intent = new Intent(getApplicationContext(), HallOfFame.class);
