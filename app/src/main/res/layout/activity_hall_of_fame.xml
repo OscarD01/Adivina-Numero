@@ -8,8 +8,8 @@
 
     <TextView
         android:id="@+id/fama"
-        android:layout_width="141dp"
-        android:layout_height="145dp"
+        android:layout_width="415dp"
+        android:layout_height="625dp"
         android:layout_marginStart="32dp"
         android:layout_marginLeft="32dp"
         android:layout_marginTop="108dp"
