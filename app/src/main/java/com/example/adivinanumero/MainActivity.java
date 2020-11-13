@@ -107,8 +107,10 @@ public class MainActivity extends AppCompatActivity {
         adRanking.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
                 value = nameRanking.getText().toString();
+                nameRanking.setText("");
                 System.out.println(tries);
                 openRanking();
+                adRanking.dismiss();
             }
         });
     }
@@ -127,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
         numGuess = (int) (Math.random() * 100 + 1);
         chronometer.setBase(SystemClock.elapsedRealtime());
         chronometer.start();
-        numGuess = 20;
+        System.out.println(numGuess);
         tries = 0;
     }
 }
