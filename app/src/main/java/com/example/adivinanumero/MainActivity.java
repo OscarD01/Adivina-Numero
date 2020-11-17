@@ -3,6 +3,7 @@ package com.example.adivinanumero;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.EditText;
@@ -24,14 +26,17 @@ import static android.provider.AlarmClock.EXTRA_MESSAGE;
 
 public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_MESSAGE = "com.example.adivinanumero.MESSAGE";
+    Button btn;
+    Button btnReset;
     private static EditText nameRanking;
     public int tries = 0;
     private AlertDialog adRanking;
     private String value;
     private int numGuess = 0;
-    private TextView txtTimer;
+    private TextView textView;
     private Chronometer chronometer;
     private long pauseOffset;
+    private int min = 0, max = 100;
 
 
     @Override
@@ -39,41 +44,73 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         prepareAlertDialog();
-        final Button btn = findViewById(R.id.btnEnviar);
+        btn = findViewById(R.id.btnEnviar);
+        btnReset = findViewById(R.id.btnReset);
         final TextView etTexto = findViewById(R.id.etTexto);
-        txtTimer = findViewById(R.id.txtTimer);
-        txtTimer.setText("");
+        textView = findViewById(R.id.textView);
         etTexto.setInputType(InputType.TYPE_CLASS_NUMBER);
         chronometer = findViewById(R.id.chrono);
         numRandom();
+        textView.setText("Introduce un Numero entre " + min +" y " + max);
         btn.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View v) {
-                int numUser = Integer.parseInt(etTexto.getText().toString());
-                if (numUser > numGuess) {
-                    Toast.makeText(MainActivity.this, "El numero que has introducido es mas grande", Toast.LENGTH_SHORT).show();
-                    etTexto.setText("");
-                    tries++;
-                    System.out.println(tries);
-                } else if (numUser < numGuess) {
-                    Toast.makeText(MainActivity.this, "El numero que has introducido es mas pequeño", Toast.LENGTH_SHORT).show();
-                    etTexto.setText("");
-                    tries++;
-                    System.out.println(tries);
+                if(!etTexto.getText().toString().isEmpty()){
+                    int numUser = Integer.parseInt(etTexto.getText().toString());
+                    if (numUser > numGuess) {
+                        Toast.makeText(MainActivity.this, "El numero que has introducido es mas grande", Toast.LENGTH_SHORT).show();
+                        etTexto.setText("");
+                        max = numUser;
+                        textView.setText("Introduce un Numero entre " + min +" y " + max);
+                        tries++;
+                        System.out.println(tries);
+                    } else if (numUser < numGuess) {
+                        Toast.makeText(MainActivity.this, "El numero que has introducido es mas pequeño", Toast.LENGTH_SHORT).show();
+                        etTexto.setText("");
+                        min = numUser;
+                        textView.setText("Introduce un Numero entre " + min +" y " + max);
+                        tries++;
+                        System.out.println(tries);
 
-                } else if (numUser == numGuess) {
-                    pauseOffset = SystemClock.elapsedRealtime() - chronometer.getBase();
-                    chronometer.stop();
-                    tries++;
-                    Toast.makeText(MainActivity.this, "Correcto. Has acertado en " + tries + " intentos", Toast.LENGTH_SHORT).show();
-                    etTexto.setText("");
-                    System.out.println(pauseOffset/1000);
-                    showRankingDialog();
-                } else if(numUser > 100 || numUser < 0){
-                    Toast.makeText(MainActivity.this, "El numero no se encuentra entre 0 y 100", Toast.LENGTH_SHORT).show();
+                    } else if (numUser == numGuess) {
+                        pauseOffset = SystemClock.elapsedRealtime() - chronometer.getBase();
+                        chronometer.stop();
+                        tries++;
+                        Toast.makeText(MainActivity.this, "Correcto. Has acertado en " + tries + " intentos", Toast.LENGTH_SHORT).show();
+                        etTexto.setText("");
+                        System.out.println(pauseOffset/1000);
+                        showRankingDialog();
+                    } else if(numUser > 100 || numUser < 0){
+                        Toast.makeText(MainActivity.this, "El numero no se encuentra entre 0 y 100", Toast.LENGTH_SHORT).show();
+                    }
                 }
+                else{
+                    tries++;
+                    Toast.makeText(MainActivity.this, "Se ha sumado un fallo por no introducir ningun numero", Toast.LENGTH_SHORT).show();
+                }
+
             }
 
+        });
+
+        etTexto.setOnKeyListener(new View.OnKeyListener(){
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)){ //|| (keyCode == KeyEvent.FLAG_EDITOR_ACTION)){
+                    btn.performClick();
+                    InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(textView.getWindowToken(), 0);
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        btnReset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                numRandom();
+            }
         });
 
     }
@@ -113,20 +150,39 @@ public class MainActivity extends AppCompatActivity {
                 adRanking.dismiss();
             }
         });
+
+        nameRanking.setOnKeyListener(new View.OnKeyListener() {
+
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)){
+                    adRanking.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
+                    InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(textView.getWindowToken(), 0);
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     public void openRanking(){
-        String message = value + "," + tries + "," + pauseOffset/1000;
-        //Reset
+
+
+        String message = value + "," + tries + "," + (int)pauseOffset/1000;
         numRandom();
         Intent intent = new Intent(getApplicationContext(), HallOfFame.class);
         intent.putExtra(EXTRA_MESSAGE, message);
         startActivity(intent);
+
     }
 
 
     public void  numRandom(){
         numGuess = (int) (Math.random() * 100 + 1);
+        min = 0;
+        max = 100;
+        textView.setText("Introduce un Numero entre " + min +" y " + max);
         chronometer.setBase(SystemClock.elapsedRealtime());
         chronometer.start();
         System.out.println(numGuess);
