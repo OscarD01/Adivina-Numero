@@ -26,6 +26,7 @@ import static android.provider.AlarmClock.EXTRA_MESSAGE;
 
 public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_MESSAGE = "com.example.adivinanumero.MESSAGE";
+    public static final String EXTRA_BITMAP  = "com.example.adivinanumero.BITMAP";
     Button btn;
     Button btnReset;
     private static EditText nameRanking;
@@ -57,7 +58,12 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if(!etTexto.getText().toString().isEmpty()){
                     int numUser = Integer.parseInt(etTexto.getText().toString());
-                    if (numUser > numGuess) {
+                    if (numUser > 100 || numUser < 0){
+                        Toast.makeText(MainActivity.this, "El numero no se encuentra entre 0 y 100", Toast.LENGTH_SHORT).show();
+                        tries++;
+                        etTexto.setText("");
+                    }
+                    else if (numUser > numGuess) {
                         Toast.makeText(MainActivity.this, "El numero que has introducido es mas grande", Toast.LENGTH_SHORT).show();
                         etTexto.setText("");
                         max = numUser;
@@ -80,8 +86,6 @@ public class MainActivity extends AppCompatActivity {
                         etTexto.setText("");
                         System.out.println(pauseOffset/1000);
                         showRankingDialog();
-                    } else if(numUser > 100 || numUser < 0){
-                        Toast.makeText(MainActivity.this, "El numero no se encuentra entre 0 y 100", Toast.LENGTH_SHORT).show();
                     }
                 }
                 else{
@@ -171,6 +175,7 @@ public class MainActivity extends AppCompatActivity {
 
         String message = value + "," + tries + "," + (int)pauseOffset/1000;
         numRandom();
+        getCameraFoto();
         Intent intent = new Intent(getApplicationContext(), HallOfFame.class);
         intent.putExtra(EXTRA_MESSAGE, message);
         startActivity(intent);
@@ -187,5 +192,11 @@ public class MainActivity extends AppCompatActivity {
         chronometer.start();
         System.out.println(numGuess);
         tries = 0;
+    }
+
+    private void getCameraFoto() {
+        Intent takePictureIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(takePictureIntent, 1);
+
     }
 }
