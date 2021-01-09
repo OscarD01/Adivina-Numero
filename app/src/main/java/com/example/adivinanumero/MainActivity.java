@@ -11,6 +11,7 @@ import android.os.SystemClock;
 import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.View;
+import android.graphics.Bitmap;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -32,12 +33,13 @@ public class MainActivity extends AppCompatActivity {
     private static EditText nameRanking;
     public int tries = 0;
     private AlertDialog adRanking;
-    private String value;
+    private String name;
     private int numGuess = 0;
     private TextView textView;
     private Chronometer chronometer;
     private long pauseOffset;
     private int min = 0, max = 100;
+    private Bitmap rankingBitmap;
 
 
     @Override
@@ -147,10 +149,10 @@ public class MainActivity extends AppCompatActivity {
         adRanking.show();
         adRanking.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-                value = nameRanking.getText().toString();
+                name = nameRanking.getText().toString();
                 nameRanking.setText("");
                 System.out.println(tries);
-                openRanking();
+                getCameraFoto();
                 adRanking.dismiss();
             }
         });
@@ -173,18 +175,27 @@ public class MainActivity extends AppCompatActivity {
     public void openRanking(){
 
 
-        String message = value + "," + tries + "," + (int)pauseOffset/1000;
+        String message = name + "," + tries + "," + (int)pauseOffset/1000;
         numRandom();
-        getCameraFoto();
         Intent intent = new Intent(getApplicationContext(), HallOfFame.class);
         intent.putExtra(EXTRA_MESSAGE, message);
+        intent.putExtra(EXTRA_BITMAP, rankingBitmap);
         startActivity(intent);
 
     }
 
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == RESULT_OK)
+        {
+            Bundle extras = data.getExtras();
+            rankingBitmap = (Bitmap) extras.get("data");
+            openRanking();
+        }
+    }
 
     public void  numRandom(){
-        numGuess = (int) (Math.random() * 100 + 1);
+        numGuess = 50; //(int) (Math.random() * 100 + 1);
         min = 0;
         max = 100;
         textView.setText("Introduce un Numero entre " + min +" y " + max);
@@ -197,6 +208,5 @@ public class MainActivity extends AppCompatActivity {
     private void getCameraFoto() {
         Intent takePictureIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(takePictureIntent, 1);
-
     }
 }
