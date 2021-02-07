@@ -38,8 +38,8 @@ public class HallOfFame extends AppCompatActivity {
         String intentMessage = intent.getStringExtra(MainActivity.EXTRA_MESSAGE);
         String[] intentMessageSplit = intentMessage.split(",");
         // Add item to adapter
-        Result newResult = new Result(intentMessageSplit[0], Integer.parseInt(intentMessageSplit[1]), Integer.parseInt(intentMessageSplit[2]), resultBitmap);
-        arrayOfResults.add(newResult);
+         Result newResult = new Result("Nombre: " + intentMessageSplit[0], "Intentos:  " + intentMessageSplit[1], "Segundos:    " +  intentMessageSplit[2], resultBitmap);// Integer.parseInt(intentMessageSplit[1]), Integer.parseInt(intentMessageSplit[2]));//, resultBitmap);
+         arrayOfResults.add(newResult);
 
         btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(new View.OnClickListener() {

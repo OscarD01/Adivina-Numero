@@ -196,6 +196,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void  numRandom(){
         numGuess = (int) (Math.random() * 100 + 1);
+        numGuess = 10;
         min = 0;
         max = 100;
         textView.setText("Introduce un Numero entre " + min +" y " + max);
