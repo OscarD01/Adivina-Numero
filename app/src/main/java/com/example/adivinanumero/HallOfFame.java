@@ -18,7 +18,7 @@ public class HallOfFame extends AppCompatActivity {
     Button btnBack;
 
     private String[] intentMessageSplit;
-    private static ArrayList<Result> arrayOfResults = new ArrayList<>();
+    private static ArrayList<Result> arrayOfResults = new ArrayList<Result>();
     //private  Bitmap resultBitmap;
 
     @Override
